@@ -2,11 +2,9 @@ import { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from '../context/useAuthStore';
 import LandingPage from '../pages/home/LandingPage';
-import PhoneLoginPage from '../pages/auth/PhoneLoginPage';
 import CompleteProfilePage from '../pages/auth/CompleteProfilePage';
 import GroupsPage from '../pages/groups/GroupsPage';
 import ProtectedRoute from '../components/common/ProtectedRoute';
-import MainLayout from '../components/layout/MainLayout';
 import EmailLoginPage from '../pages/auth/EmailLoginPage';
 
 export default function AppRouter() {
@@ -30,13 +28,28 @@ export default function AppRouter() {
       <Route path="/login" element={<EmailLoginPage />} />
       <Route path="/complete-profile" element={<CompleteProfilePage />} />
 
-      <Route path="/app">
-        <Route index element={<Navigate to="groups" replace />} />
-        <Route path="groups" element={<GroupsPage />} />
-        {/* later: /app/groups/:id, /app/profile, /app/kyc, /app/help, etc */}
-      </Route>
+      {/* 🔐 PROTECTED ROUTES */}
+      <Route
+        path="/app/*"
+        element={
+          <ProtectedRoute>
+            <AppProtectedRoutes />
+          </ProtectedRoute>
+        }
+      />
 
       <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+}
+
+/** Sub-Router for authenticated pages */
+function AppProtectedRoutes() {
+  return (
+    <Routes>
+      <Route index element={<Navigate to="groups" replace />} />
+      <Route path="groups" element={<GroupsPage />} />
+      {/* Next additions: /app/profile, /app/help, /app/kyc */}
     </Routes>
   );
 }

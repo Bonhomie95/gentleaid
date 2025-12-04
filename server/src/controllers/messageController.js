@@ -3,6 +3,9 @@ import GroupMember from '../models/GroupMember.js';
 
 export const getGroupMessages = async (req, res) => {
   const { groupId } = req.params;
+  if (!groupId || groupId === 'undefined') {
+    return res.status(400).json({ message: 'Invalid groupId' });
+  }
 
   const messages = await Message.find({ groupId })
     .populate('senderId', 'username firstName lastName displayAsUsername')
