@@ -14,7 +14,7 @@ router.get('/', authMiddleware, getAllGroups);
 
 router.get('/mine', authMiddleware, getMyGroups);
 
-router.post('/join', authMiddleware, joinGroup);
+router.post('/:groupId/join', authMiddleware, joinGroup);
 
 router.post('/leave', authMiddleware, leaveGroup);
 

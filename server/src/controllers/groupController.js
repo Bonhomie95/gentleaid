@@ -14,21 +14,22 @@ export const getAllGroups = async (req, res) => {
 // -----------------------------------------
 export const joinGroup = async (req, res) => {
   const userId = req.userId;
-  const { groupId } = req.body;
+  const groupId = req.params.groupId;
 
   const group = await Group.findById(groupId);
   if (!group) return res.status(404).json({ message: 'Group not found' });
 
-  // Check if already in group
   const existing = await GroupMember.findOne({ userId, groupId });
-  if (existing) return res.json({ message: 'Already joined' });
+  if (existing) {
+    return res.json({ message: 'Already joined', isMember: true });
+  }
 
   await GroupMember.create({ userId, groupId });
 
   group.memberCount = await GroupMember.countDocuments({ groupId });
   await group.save();
 
-  res.json({ message: 'Joined successfully' });
+  res.json({ message: 'Joined successfully', isMember: true });
 };
 
 // -----------------------------------------

@@ -6,35 +6,42 @@ export const getMe = async (req, res) => {
   res.json(user);
 };
 
-// Update profile (username, real name, avatar, display pref)
 export const updateProfile = async (req, res) => {
-  const userId = req.userId;
+  try {
+    const userId = req.userId;
+    const { username, firstName, lastName, displayAsUsername, avatar } =
+      req.body;
 
-  const { username, firstName, lastName, avatarUrl, displayPreference } =
-    req.body;
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
 
-  // username must be unique
-  if (username) {
-    const exists = await User.findOne({ username, _id: { $ne: userId } });
-    if (exists) {
-      return res.status(400).json({ message: 'Username already taken' });
+    // Unique username check
+    if (username && username !== user.username) {
+      const exists = await User.findOne({ username });
+      if (exists) {
+        return res.status(400).json({ message: "Username already taken" });
+      }
     }
+
+    user.username = username ?? user.username;
+    user.firstName = firstName ?? user.firstName;
+    user.lastName = lastName ?? user.lastName;
+    user.displayAsUsername =
+      displayAsUsername !== undefined
+        ? displayAsUsername
+        : user.displayAsUsername;
+
+    if (avatar) user.avatar = avatar;
+
+    await user.save();
+
+    res.json({ message: "Profile updated", user });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Update failed" });
   }
-
-  const user = await User.findByIdAndUpdate(
-    userId,
-    {
-      username,
-      firstName,
-      lastName,
-      avatarUrl,
-      displayPreference,
-    },
-    { new: true }
-  );
-
-  res.json({ message: 'Profile updated', user });
 };
+
 
 // Soft delete account
 export const deleteAccount = async (req, res) => {

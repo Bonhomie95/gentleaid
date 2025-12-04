@@ -1,28 +1,36 @@
 import { saveMessage } from '../controllers/messageController.js';
 
 export default function chatSocket(io, socket) {
-  // User joins a group room
-  socket.on('join_group', ({ groupId }) => {
+  // join group room
+  socket.on('joinRoom', (groupId) => {
     socket.join(groupId);
-    console.log(`User ${socket.id} joined group ${groupId}`);
+    console.log(`User ${socket.id} joined room ${groupId}`);
   });
 
-  // User leaves a group room
-  socket.on('leave_group', ({ groupId }) => {
+  // leave group room
+  socket.on('leaveRoom', (groupId) => {
     socket.leave(groupId);
   });
 
-  // Typing indicator
+  // typing
   socket.on('typing', ({ groupId, user }) => {
     socket.to(groupId).emit('typing', { user });
   });
 
-  // User sends message
-  socket.on('send_message', async ({ groupId, senderId, content }) => {
-    if (!content.trim()) return;
+  // send message
+  socket.on('message:send', async ({ groupId, content }) => {
+    const senderId = socket.userId;
+
+    if (!content?.trim()) return;
 
     const saved = await saveMessage({ groupId, senderId, content });
 
-    io.to(groupId).emit('new_message', saved);
+    io.to(groupId).emit('message:new', {
+      _id: saved._id,
+      content: saved.content,
+      groupId: saved.groupId,
+      senderId: saved.senderId,
+      createdAt: saved.createdAt,
+    });
   });
 }
