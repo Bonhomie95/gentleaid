@@ -30,14 +30,7 @@ export default function AppRouter() {
       <Route path="/login" element={<EmailLoginPage />} />
       <Route path="/complete-profile" element={<CompleteProfilePage />} />
 
-      <Route
-        path="/app"
-        element={
-          <ProtectedRoute>
-            <MainLayout />
-          </ProtectedRoute>
-        }
-      >
+      <Route path="/app">
         <Route index element={<Navigate to="groups" replace />} />
         <Route path="groups" element={<GroupsPage />} />
         {/* later: /app/groups/:id, /app/profile, /app/kyc, /app/help, etc */}

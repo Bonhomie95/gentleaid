@@ -157,6 +157,7 @@ export default function EmailLoginPage() {
               onClick={() => setStep('EMAIL')}
               style={{
                 ...buttonStyle,
+                color: 'white',
                 marginTop: '.5rem',
                 background: 'transparent',
                 border: '1px solid #4b5563',
