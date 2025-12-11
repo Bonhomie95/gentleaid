@@ -1,4 +1,3 @@
-// src/pages/groups/GroupsPage.jsx
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '../../context/useAuthStore';
 import { socket } from '../../socket';
@@ -247,9 +246,20 @@ export default function GroupsPage() {
       </div>
 
       {/* MODALS / DRAWERS */}
-      {helpOpen && <HelpRequestModal onClose={() => setHelpOpen(false)} />}
-      {donateOpen && <DonateModal onClose={() => setDonateOpen(false)} />}
-      {profileOpen && <ProfileDrawer onClose={() => setProfileOpen(false)} />}
+      {helpOpen && (
+        <HelpRequestModal open={helpOpen} onClose={() => setHelpOpen(false)} />
+      )}
+
+      {donateOpen && (
+        <DonateModal open={donateOpen} onClose={() => setDonateOpen(false)} />
+      )}
+
+      {profileOpen && (
+        <ProfileDrawer
+          open={profileOpen}
+          onClose={() => setProfileOpen(false)}
+        />
+      )}
     </>
   );
 }

@@ -14,9 +14,10 @@ export default function MobileTopBar({ theme, toggleTheme, onMenuToggle }) {
       <span style={{ fontWeight: 700 }}>GentelAid</span>
 
       <div style={{ display: 'flex', gap: '.5rem' }}>
-        <button style={ic} onClick={toggleTheme}>
+        <button onClick={toggleTheme} style={iconStyle(theme)}>
           {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
         </button>
+
         <button style={ic} onClick={onMenuToggle}>
           <Menu size={18} />
         </button>
@@ -32,3 +33,12 @@ const ic = {
   padding: '.35rem',
   cursor: 'pointer',
 };
+
+const iconStyle = (theme) => ({
+  border: `1px solid ${theme === 'dark' ? '#374151' : '#d1d5db'}`,
+  background: 'transparent',
+  color: theme === 'dark' ? '#e2e8f0' : '#111',
+  borderRadius: '999px',
+  padding: '.35rem',
+  cursor: 'pointer',
+});

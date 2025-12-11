@@ -13,7 +13,7 @@ export default function GroupList({ groups, activeGroupId, onSelect, search }) {
           key={group._id}
           group={group}
           active={activeGroupId === group._id}
-          onClick={() => onSelect(group._id)}
+          onClick={() => onSelect(group)}
         />
       ))}
     </div>
