@@ -22,6 +22,11 @@ app.use(helmet());
 app.use(express.json());
 app.use(cookieParser());
 app.use(morgan('dev'));
+app.use('/uploads', express.static('uploads'));
+app.use((req, res, next) => {
+  req.io = req.app.get('io');
+  next();
+});
 
 // Limit OTP brute force
 app.use(

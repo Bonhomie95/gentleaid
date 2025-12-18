@@ -32,6 +32,10 @@ export default function ChatWindow({
     setAutoScroll(isBottom);
   };
 
+  const handleReact = async (message, emoji = '👍') => {
+    await api.post(`/chat/message/${message._id}/react`, { emoji });
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
       {/* CHAT HEADER */}
@@ -70,14 +74,28 @@ export default function ChatWindow({
         {loadingMessages ? (
           'Loading...'
         ) : (
-          <MessageList messages={messages} currentUserId={user._id} />
+          <MessageList
+            messages={messages}
+            currentUserId={user._id}
+            onReact={handleReact}
+          />
         )}
       </div>
 
       <TypingIndicator groupId={group._id} user={user} />
 
       {isMember ? (
-        <MessageInput sending={sending} onSend={onSendMessage} />
+        <MessageInput
+          sending={sending}
+          onSend={onSendMessage}
+          user={user}
+          groupId={group._id}
+          displayName={
+            user.displayAsUsername
+              ? user.username
+              : `${user.firstName} ${user.lastName}`.trim()
+          }
+        />
       ) : (
         <div
           style={{

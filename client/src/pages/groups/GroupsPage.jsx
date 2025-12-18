@@ -8,7 +8,7 @@ import GroupSidebar from '../../components/groups/GroupSidebar';
 import GroupTopBar from '../../components/groups/GroupTopBar';
 import MobileTopBar from '../../components/groups/MobileTopBar';
 import MobileMenu from '../../components/groups/MobileMenu';
-import ChatWindow from '../../components/groups/ChatWindow/ChatWindow';
+import ChatWindow from '../../components/groups/chatwindow/ChatWindow';
 
 // Modals / Drawers
 import HelpRequestModal from '../../components/help/HelpRequestModal';
@@ -95,18 +95,72 @@ export default function GroupsPage() {
   // -------------------------
   // Send message
   // -------------------------
-  const handleSendMessage = async (text) => {
-    if (!activeGroup || !isMember || !text.trim()) return;
+  const handleSendMessage = async (payload) => {
+    if (!activeGroup || !isMember) return;
 
-    setSending(true);
+    let content = '';
+    let type = 'text';
+    let voiceUrl = null;
+    let durationMs = null;
+
+    // TEXT MESSAGE
+    if (typeof payload === 'string') {
+      if (!payload.trim()) return;
+      content = payload.trim();
+    }
+
+    // OBJECT MESSAGE (voice, emoji, etc)
+    else if (typeof payload === 'object') {
+      type = payload.type;
+
+      if (type === 'voice') {
+        voiceUrl = payload.voiceUrl;
+        durationMs = payload.durationMs;
+        content = '[Voice note]';
+      } else {
+        content = payload.content?.trim();
+        if (!content) return;
+      }
+    }
+
+    const tempId = `tmp-${Date.now()}`;
+    const optimistic = {
+      _id: tempId,
+      content,
+      type,
+      voiceUrl,
+      durationMs,
+      groupId: activeGroup._id,
+      senderId: user._id,
+      senderDisplayName: user.displayAsUsername
+        ? user.username
+        : `${user.firstName} ${user.lastName}`.trim(),
+      createdAt: new Date(),
+      reactions: [],
+    };
+
+    setMessages((prev) => [...prev, optimistic]);
+    console.log('Sending message optimistically', optimistic);
+
     try {
+      const res = await api.post(`/chat/group/${activeGroup._id}`, {
+        content,
+        type,
+        voiceUrl,
+        durationMs,
+      });
+
+      const saved = res.data.message;
+
+      setMessages((prev) => prev.map((m) => (m._id === tempId ? saved : m)));
+
       socket.emit('send_message', {
         groupId: activeGroup._id,
-        senderId: user._id,
-        content: text.trim(),
+        message: saved,
       });
-    } finally {
-      setSending(false);
+    } catch (err) {
+      console.error(err);
+      setMessages((prev) => prev.filter((m) => m._id !== tempId));
     }
   };
 

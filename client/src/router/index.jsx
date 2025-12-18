@@ -6,13 +6,18 @@ import CompleteProfilePage from '../pages/auth/CompleteProfilePage';
 import GroupsPage from '../pages/groups/GroupsPage';
 import ProtectedRoute from '../components/common/ProtectedRoute';
 import EmailLoginPage from '../pages/auth/EmailLoginPage';
+import { connectSocketWithToken } from '../socket';
 
 export default function AppRouter() {
-  const { hydrated, hydrate } = useAuthStore();
+  const { token, hydrated, hydrate } = useAuthStore();
 
   useEffect(() => {
     hydrate();
   }, [hydrate]);
+
+  useEffect(() => {
+    if (hydrated && token) connectSocketWithToken(token);
+  }, [hydrated, token]);
 
   if (!hydrated) {
     return (

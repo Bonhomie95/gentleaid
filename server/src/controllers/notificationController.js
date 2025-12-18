@@ -1,6 +1,6 @@
 import Notification from '../models/Notification.js';
 
-// Get my notifications
+
 export const getMyNotifications = async (req, res) => {
   const userId = req.userId;
 
